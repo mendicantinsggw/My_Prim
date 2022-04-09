@@ -1,6 +1,6 @@
 import sys
 from PyQt5.QtWidgets import QApplication
-from my_graph import Window
+from window import Window
 
 
 if __name__ == "__main__":
