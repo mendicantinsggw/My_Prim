@@ -5,7 +5,6 @@ from key_event_thread import KeyEventThread
 from command_line_thread import CommandLineThread
 
 
-
 class NetworkTabUi(QDialog):
     def __init__(self, U, B):
         super().__init__()
