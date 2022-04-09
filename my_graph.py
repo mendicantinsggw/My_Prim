@@ -1,11 +1,4 @@
 import sys
-from PyQt5.QtWidgets import (
-    QApplication,
-    QTabWidget,
-    QVBoxLayout,
-    QWidget,
-)
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
 from matplotlib.figure import Figure
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
@@ -14,7 +7,6 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 import networkx as nx
 import threading
-from time import sleep
 from pynput.keyboard import Listener, Key
 
 
