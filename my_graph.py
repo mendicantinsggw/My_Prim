@@ -7,7 +7,7 @@ import networkx as nx
 import threading
 from pynput.keyboard import Listener, Key
 
-
+XD()
 class KeyEventThread(threading.Thread):
     def __init__(self, run_cmd):
         super().__init__()
@@ -232,10 +232,3 @@ class Window(QWidget):
     def network_tab_ui(self):
         dlg = MyDialog(self, self.B)
         return dlg
-
-
-if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    window = Window()
-    window.show()
-    sys.exit(app.exec_())
