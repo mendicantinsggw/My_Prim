@@ -222,7 +222,7 @@ class Window(QWidget):
     def generate_tab_ui(self):
         self.figure.clf()
 
-        pos = nx.spring_layout(self.B, k=self.B.number_of_nodes())  # pos = nx.nx_agraph.graphviz_layout(G)
+        pos = nx.spring_layout(self.B)  # pos = nx.nx_agraph.graphviz_layout(G)
         nx.draw_networkx(self.B, pos)
         labels = nx.get_edge_attributes(self.B, 'weight')
         nx.draw_networkx_edge_labels(self.B, pos, edge_labels=labels)
