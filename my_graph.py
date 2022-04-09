@@ -1,8 +1,6 @@
 import sys
-from matplotlib.figure import Figure
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
-import subprocess
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 import networkx as nx
@@ -18,7 +16,7 @@ class KeyEventThread(threading.Thread):
         self.listner.start()
 
     def on_press(self, key):
-        if(key == Key.enter):
+        if key == Key.enter:
             self.run_cmd()
 
 
@@ -40,31 +38,31 @@ class MyThread(QThread):
         except:
             self.cmd = line
 
-        self.line_printed.emit("> "+self.cmd+"\n")
+        self.line_printed.emit("> " + self.cmd + "\n")
         if self.cmd:
             commands = self.cmd.split()
 
-            if(commands[0] == "add"):
-                if(len(commands) == 2):
-                    if(not B.has_node(commands[1])):
+            if commands[0] == "add":
+                if len(commands) == 2:
+                    if not B.has_node(commands[1]):
                         self.parent.add_node_and_generate(commands[1])
                     else:
                         self.line_printed.emit("this node already exist\n")
                 else:
                     self.line_printed.emit("only one id must be\n")
 
-            elif(commands[0] == "delete"):
-                if(len(commands) == 2):
-                    if(B.has_node(commands[1])):
+            elif commands[0] == "delete":
+                if len(commands) == 2:
+                    if B.has_node(commands[1]):
                         self.parent.remove_node_and_generate(commands[1])
                     else:
                         self.line_printed.emit("this node doesnt't exist\n")
                 else:
                     self.line_printed.emit("only one id must be\n")
 
-            elif(commands[0] == "connect"):
-                if(len(commands) == 4):
-                    if(B.has_node(commands[1]) and B.has_node(commands[2]) and not B.has_edge(commands[1], commands[2])):
+            elif commands[0] == "connect":
+                if len(commands) == 4:
+                    if B.has_node(commands[1]) and B.has_node(commands[2]) and not B.has_edge(commands[1], commands[2]):
                         self.parent.add_edge_and_generate(
                             commands[1], commands[2], int(commands[3]))
                     else:
@@ -73,9 +71,9 @@ class MyThread(QThread):
                 else:
                     self.line_printed.emit("two ids must be\n")
 
-            elif(commands[0] == "delconnect"):
-                if(len(commands) == 3):
-                    if(B.has_node(commands[1]) and B.has_node(commands[2]) and B.has_edge(commands[1], commands[2])):
+            elif commands[0] == "delconnect":
+                if len(commands) == 3:
+                    if B.has_node(commands[1]) and B.has_node(commands[2]) and B.has_edge(commands[1], commands[2]):
                         self.parent.remove_edge_and_generate(
                             commands[1], commands[2])
                     else:
@@ -84,15 +82,15 @@ class MyThread(QThread):
                 else:
                     self.line_printed.emit("two ids must be\n")
 
-            elif(commands[0] == "prim"):
-                if(len(commands) == 2):
-                    if(B.has_node(commands[1])):
+            elif commands[0] == "prim":
+                if len(commands) == 2:
+                    if B.has_node(commands[1]):
                         self.parent.prims_algoritm(commands[1])
                 else:
                     self.line_printed.emit("one id must be\n")
 
-            elif(commands[0] == "readfrom"):
-                if(len(commands) == 2):
+            elif commands[0] == "readfrom":
+                if len(commands) == 2:
                     try:
                         file = open(commands[1], 'r').read()
                         lines = file.split('\n')
@@ -104,11 +102,11 @@ class MyThread(QThread):
                 else:
                     self.line_printed.emit("one id must be\n")
 
-            elif(commands[0] == "refresh"):
-                if(len(commands) == 1):
+            elif commands[0] == "refresh":
+                if len(commands) == 1:
                     self.parent.refresh()
 
-            elif(self.cmd == "help"):
+            elif self.cmd == "help":
                 self.line_printed.emit(
                     "~ add id \n~ delete id \n~ connect id1 id2 weight \n~ delconnect id1 id2 \n~ prim id \n~ readfrom file.txt \n~ refresh \n")
 
@@ -140,19 +138,19 @@ class MyDialog(QDialog):
 
     def add_node_and_generate(self, id):
         self.B.add_node(id)
-        self.U.generalTabUI()
+        self.U.generate_tab_ui()
 
     def remove_node_and_generate(self, id):
         self.B.remove_node(id)
-        self.U.generalTabUI()
+        self.U.generate_tab_ui()
 
     def add_edge_and_generate(self, id1, id2, new_weight):
         self.B.add_edge(id1, id2, weight=new_weight)
-        self.U.generalTabUI()
+        self.U.generate_tab_ui()
 
     def remove_edge_and_generate(self, id1, id2):
         self.B.remove_edge(id1, id2)
-        self.U.generalTabUI()
+        self.U.generate_tab_ui()
 
     def prims_algoritm(self, id):
         H = nx.Graph()
@@ -165,31 +163,31 @@ class MyDialog(QDialog):
         INF = 10000
         V = len(A.toarray())
         G = A.toarray()
-        selected = [0]*len(A.toarray())
+        selected = [0] * len(A.toarray())
         no_edge = 0
         print(list(self.B.nodes()))
         selected[list(self.B.nodes()).index(id)] = True
-        while (no_edge < V - 1):
+        while no_edge < V - 1:
             minimum = INF
             x = 0
             y = 0
             for i in range(V):
                 if selected[i]:
                     for j in range(V):
-                        if ((not selected[j]) and G[i][j]):
+                        if (not selected[j]) and G[i][j]:
                             if minimum > G[i][j]:
                                 minimum = G[i][j]
                                 x = i
                                 y = j
             self.thread.line_printed.emit(
-                str(x) + "-" + str(y) + ":" + str(G[x][y])+"\n")
+                str(x) + "-" + str(y) + ":" + str(G[x][y]) + "\n")
             print(str(x) + "-" + str(y) + ":" + str(G[x][y]))
             selected[y] = True
             no_edge += 1
-        self.U.generalTabUI()
+        self.U.generate_tab_ui()
 
     def refresh(self):
-        self.U.generalTabUI()
+        self.U.generate_tab_ui()
 
     def run_thread(self):
         self.thread.run(self.lineEdit, self.B)
@@ -216,23 +214,22 @@ class Window(QWidget):
         self.B = nx.Graph()
 
         tabs = QTabWidget()
-        tabs.addTab(self.networkTabUI(), "Terminal")
-        tabs.addTab(self.generalTabUI(), "Canvas")
+        tabs.addTab(self.network_tab_ui(), "Terminal")
+        tabs.addTab(self.generate_tab_ui(), "Canvas")
 
         layout.addWidget(tabs)
 
-    def generalTabUI(self):
+    def generate_tab_ui(self):
         self.figure.clf()
 
-        pos = nx.spring_layout(self.B)  # pos = nx.nx_agraph.graphviz_layout(G)
+        pos = nx.spring_layout(self.B, k=self.B.number_of_nodes())  # pos = nx.nx_agraph.graphviz_layout(G)
         nx.draw_networkx(self.B, pos)
         labels = nx.get_edge_attributes(self.B, 'weight')
         nx.draw_networkx_edge_labels(self.B, pos, edge_labels=labels)
-
         self.canvas.draw_idle()
         return self.canvas
 
-    def networkTabUI(self):
+    def network_tab_ui(self):
         dlg = MyDialog(self, self.B)
         return dlg
 
