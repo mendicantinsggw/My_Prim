@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 import networkx as nx
 
-from network_tab_ui import NetworkTabUi
+from tabs.network_drawing.network_tab_ui import NetworkTabUi
 
 
 class Window(QWidget):

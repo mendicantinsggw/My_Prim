@@ -1,8 +1,8 @@
 import networkx as nx
 from PyQt5.QtWidgets import QDialog, QTextEdit, QLineEdit, QVBoxLayout
 
-from key_event_thread import KeyEventThread
-from command_line_thread import CommandLineThread
+from tabs.command_line.key_event_thread import KeyEventThread
+from tabs.command_line.command_line_thread import CommandLineThread
 
 
 class NetworkTabUi(QDialog):
