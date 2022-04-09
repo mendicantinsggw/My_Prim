@@ -7,7 +7,7 @@ import networkx as nx
 import threading
 from pynput.keyboard import Listener, Key
 
-XD()
+
 class KeyEventThread(threading.Thread):
     def __init__(self, run_cmd):
         super().__init__()
