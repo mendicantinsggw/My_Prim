@@ -1,0 +1,21 @@
+add a
+add b
+add c
+add e
+add f
+add d
+connect a b 12
+connect a c 2
+connect a d 5
+connect a e 3
+connect a f 8
+connect b c 34
+connect b d 2
+connect b e 1
+connect b f 57
+connect c d 6
+connect c e 4
+connect c f 2
+connect d e 4
+connect d f 0
+connect e f 2
