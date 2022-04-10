@@ -3,7 +3,7 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 import networkx as nx
 
 
-class GraphCanvas(FigureCanvas):
+class GraphDrawing(FigureCanvas):
     def __init__(self, G):
         self.figure = plt.figure()
         super().__init__(self.figure)

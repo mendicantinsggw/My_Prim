@@ -4,7 +4,7 @@ import networkx as nx
 # from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 
 from tabs.command_line.ui import CommandLineUi
-from tabs.drawing.graph_canvas import GraphCanvas as GraphDrawing
+from tabs.drawing.graph_drawing import GraphDrawing as GraphDrawing
 
 
 class Window(QWidget):

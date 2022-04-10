@@ -3,21 +3,21 @@ from PyQt5.QtWidgets import QDialog, QTextEdit, QLineEdit, QVBoxLayout
 
 from tabs.command_line.key_event_thread import KeyEventThread
 from tabs.command_line.command_line_thread import CommandLineThread
-from tabs.drawing.graph_canvas import GraphCanvas
+from tabs.drawing.graph_drawing import GraphDrawing
 
 
 class CommandLineUi(QDialog):
-    def __init__(self, canvas: GraphCanvas, G: nx.Graph):
+    def __init__(self, drawing: GraphDrawing, G: nx.Graph):
         super().__init__()
         self.G = G
-        self.canvas = canvas
+        self.drawing = drawing
         self.textEdit = QTextEdit(self)
         self.textEdit.setReadOnly(True)
-        self.lineEdit = QLineEdit('', self)
+        self.input_line = QLineEdit('', self)
 
         self.layout = QVBoxLayout(self)
         self.layout.addWidget(self.textEdit)
-        self.layout.addWidget(self.lineEdit)
+        self.layout.addWidget(self.input_line)
 
         KeyEventThread(self.run_thread)
         self.thread = CommandLineThread(self)
@@ -25,7 +25,7 @@ class CommandLineUi(QDialog):
         self.thread.start_message()
 
     def run_thread(self):
-        self.thread.run(self.lineEdit, self.G)
+        self.thread.run(self.input_line, self.G)
 
     def handle_line(self, line):
         cursor = self.textEdit.textCursor()

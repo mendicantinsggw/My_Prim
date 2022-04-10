@@ -3,11 +3,11 @@ from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QLineEdit
 from networkx import Graph
 
-from tabs.drawing.graph_canvas import GraphCanvas
+from tabs.drawing.graph_drawing import GraphDrawing
 
 
 class Command:
-    def __init__(self, text_line: str, G: Graph, drawing: GraphCanvas, line_printed: pyqtSignal):
+    def __init__(self, text_line: str, G: Graph, drawing: GraphDrawing, line_printed: pyqtSignal):
         self.function: str = None
         self.args: str = None
         self.set(text_line)
