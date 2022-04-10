@@ -8,7 +8,7 @@ class CommandLineThread(QThread):
     line_printed = pyqtSignal(str)
 
     def __init__(self, CmdUi):
-        super(CommandLineThread, self).__init__(CmdUi)
+        super().__init__(CmdUi)
         self.drawing = CmdUi.drawing
 
     def start_message(self):
