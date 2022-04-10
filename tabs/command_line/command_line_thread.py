@@ -1,14 +1,13 @@
 from PyQt5.QtCore import QThread, pyqtSignal
 from PyQt5.QtWidgets import QLineEdit
 
-from tabs.network_drawing import network_tab_ui
 from tabs.command_line.command import Command
 
 
 class CommandLineThread(QThread):
     line_printed = pyqtSignal(str)
 
-    def __init__(self, drawing: network_tab_ui):
+    def __init__(self, drawing):  # : CommandLineUi
         super(CommandLineThread, self).__init__(drawing)
         self.drawing = drawing
 

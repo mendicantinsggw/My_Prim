@@ -1,12 +1,10 @@
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QLineEdit
-
-from tabs.network_drawing import network_tab_ui
 from networkx import Graph
 
 
 class Command:
-    def __init__(self, text_line: str, G: Graph, drawing: network_tab_ui, line_printed: pyqtSignal):
+    def __init__(self, text_line: str, G: Graph, drawing, line_printed: pyqtSignal):
         self.function: str = None
         self.args: str = None
         self.set(text_line)

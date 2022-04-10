@@ -3,13 +3,14 @@ from PyQt5.QtWidgets import QDialog, QTextEdit, QLineEdit, QVBoxLayout
 
 from tabs.command_line.key_event_thread import KeyEventThread
 from tabs.command_line.command_line_thread import CommandLineThread
+from tabs.drawing.graph_canvas import GraphCanvas
 
 
-class NetworkTabUi(QDialog):
-    def __init__(self, U, B):
+class CommandLineUi(QDialog):
+    def __init__(self, canvas: GraphCanvas, G: nx.Graph):
         super().__init__()
-        self.B = B
-        self.U = U
+        self.B = G
+        self.canvas = canvas
         self.textEdit = QTextEdit(self)
         self.textEdit.setReadOnly(True)
         self.lineEdit = QLineEdit('', self)
@@ -26,19 +27,19 @@ class NetworkTabUi(QDialog):
 
     def add_node_and_generate(self, id):
         self.B.add_node(id)
-        self.U.generate_tab_ui()
+        self.canvas.redraw()
 
     def remove_node_and_generate(self, id):
         self.B.remove_node(id)
-        self.U.generate_tab_ui()
+        self.canvas.redraw()
 
     def add_edge_and_generate(self, id1, id2, new_weight):
         self.B.add_edge(id1, id2, weight=new_weight)
-        self.U.generate_tab_ui()
+        self.canvas.redraw()
 
     def remove_edge_and_generate(self, id1, id2):
         self.B.remove_edge(id1, id2)
-        self.U.generate_tab_ui()
+        self.canvas.redraw()
 
     def prims_algoritm(self, id):
         H = nx.Graph()
@@ -72,10 +73,10 @@ class NetworkTabUi(QDialog):
             print(str(x) + "-" + str(y) + ":" + str(G[x][y]))
             selected[y] = True
             no_edge += 1
-        self.U.generate_tab_ui()
+        self.canvas.redraw()
 
     def refresh(self):
-        self.U.generate_tab_ui()
+        self.canvas.redraw()
 
     def run_thread(self):
         self.thread.run(self.lineEdit, self.B)
