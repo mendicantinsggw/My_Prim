@@ -2,7 +2,7 @@ from threading import Thread
 from pynput.keyboard import Listener, Key
 
 
-class KeyEventThread(Thread):
+class TypeCommandEventThread(Thread):
     def __init__(self, run_cmd):
         super().__init__()
         self.run_cmd = run_cmd
@@ -12,5 +12,3 @@ class KeyEventThread(Thread):
     def on_press(self, key):
         if key == Key.enter:
             self.run_cmd()
-
-

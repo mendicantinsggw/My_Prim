@@ -7,9 +7,9 @@ from tabs.drawing.graph_drawing import GraphDrawing
 
 
 class Command:
-    def __init__(self, text_line: str, G: Graph, drawing: GraphDrawing, line_printed: pyqtSignal):
+    def __init__(self, text_line: str | QLineEdit, G: Graph, drawing: GraphDrawing, line_printed: pyqtSignal):
         self.function: str = None
-        self.args: str = None
+        self.args: list[str] = []
         self.set(text_line)
         self.G = G
         self.drawing = drawing
@@ -21,8 +21,9 @@ class Command:
         except AttributeError:
             command_text = text_line.split()
 
-        self.function = command_text[0]
-        self.args = command_text[1:]
+        if len(command_text) >= 1:
+            self.function = command_text[0]
+            self.args = command_text[1:]
 
     def run(self):
         self.line_printed.emit(f"> {self.function} {' '.join(self.args)}\n")

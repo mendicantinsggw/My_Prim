@@ -1,8 +1,8 @@
 import networkx as nx
 from PyQt5.QtWidgets import QDialog, QTextEdit, QLineEdit, QVBoxLayout
 
-from tabs.command_line.key_event_thread import KeyEventThread
-from tabs.command_line.command_line_thread import CommandLineThread
+from tabs.command_line.key_event_thread import TypeCommandEventThread
+from tabs.command_line.command_line_thread import CmdInputHandler
 from tabs.drawing.graph_drawing import GraphDrawing
 
 
@@ -19,13 +19,8 @@ class CommandLineUi(QDialog):
         self.layout.addWidget(self.textEdit)
         self.layout.addWidget(self.input_line)
 
-        KeyEventThread(self.run_thread)
-        self.thread = CommandLineThread(self)
-        self.thread.line_printed.connect(self.handle_line)
-        self.thread.start_message()
-
-    def run_thread(self):
-        self.thread.run(self.input_line, self.G)
+        self.input_handler = CmdInputHandler(self)
+        self.input_handler.printed_line.connect(self.handle_line)
 
     def handle_line(self, line):
         cursor = self.textEdit.textCursor()
