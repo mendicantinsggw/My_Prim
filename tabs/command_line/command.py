@@ -1,10 +1,13 @@
+import networkx as nx
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QLineEdit
 from networkx import Graph
 
+from tabs.drawing.graph_canvas import GraphCanvas
+
 
 class Command:
-    def __init__(self, text_line: str, G: Graph, drawing, line_printed: pyqtSignal):
+    def __init__(self, text_line: str, G: Graph, drawing: GraphCanvas, line_printed: pyqtSignal):
         self.function: str = None
         self.args: str = None
         self.set(text_line)
@@ -42,13 +45,15 @@ class Command:
         else:
             self.__print_syntax_error()
 
+        self.drawing.redraw()
+
     def __add(self):
         if len(self.args) != 1:
             self.line_printed.emit("only one id must be\n")
             return
 
         if not self.G.has_node(self.args[0]):
-            self.drawing.add_node_and_generate(self.args[0])
+            self.G.add_node(self.args[0])
         else:
             self.line_printed.emit("this node already exist\n")
 
@@ -58,7 +63,7 @@ class Command:
             return
 
         if self.G.has_node(self.args[0]):
-            self.drawing.remove_node_and_generate(self.args[0])
+            self.G.remove_node(self.args[0])
         else:
             self.line_printed.emit("this node doesnt't exist\n")
 
@@ -68,8 +73,8 @@ class Command:
             return
 
         if self.G.has_node(self.args[0]) and self.G.has_node(self.args[1]) and not self.G.has_edge(self.args[0], self.args[1]):
-            self.drawing.add_edge_and_generate(
-                self.args[0], self.args[1], int(self.args[2])
+            self.G.add_edge(
+                self.args[0], self.args[1], weight=int(self.args[2])
             )
         else:
             self.line_printed.emit("nodes don't exist or edge already exist\n")
@@ -80,16 +85,43 @@ class Command:
             return
 
         if self.G.has_edge(self.args[0], self.args[1]):
-            self.drawing.remove_edge_and_generate(
-                self.args[0], self.args[1]
-            )
+            self.G.remove_edge(self.args[0], self.args[1])
         else:
             self.line_printed.emit("nodes don't exist or edge doesn't exist\n")
 
     def __prim_algorithm(self):
         if len(self.args) != 1:
             if self.G.has_node(self.args[0]):
-                self.drawing.prims_algoritm(self.args[0])
+                H = nx.Graph()
+                H.add_nodes_from(sorted(self.G.nodes(data=True)))
+                H.add_edges_from(self.G.edges(data=True))
+                self.G = H
+
+                A = nx.adjacency_matrix(self.G)
+                INF = 10000
+                V = len(A.toarray())
+                G = A.toarray()
+                selected = [0] * len(A.toarray())
+                no_edge = 0
+                print(list(self.G.nodes()))
+                selected[list(self.G.nodes()).index(self.args[0])] = True
+                while no_edge < V - 1:
+                    minimum = INF
+                    x = 0
+                    y = 0
+                    for i in range(V):
+                        if selected[i]:
+                            for j in range(V):
+                                if (not selected[j]) and G[i][j]:
+                                    if minimum > G[i][j]:
+                                        minimum = G[i][j]
+                                        x = i
+                                        y = j
+                    self.line_printed.emit(
+                        str(x) + "-" + str(y) + ":" + str(G[x][y]) + "\n")
+                    print(str(x) + "-" + str(y) + ":" + str(G[x][y]))
+                    selected[y] = True
+                    no_edge += 1
         else:
             self.line_printed.emit("one id must be\n")
 
@@ -112,7 +144,7 @@ class Command:
             self.line_printed.emit("Refresh doesn't take any arguments")
             return
 
-        self.drawing.refresh()
+        self.drawing.redraw()
 
     def __print_help(self):
         self.line_printed.emit(
