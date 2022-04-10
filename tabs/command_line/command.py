@@ -25,7 +25,7 @@ class Command:
             self.function = command_text[0]
             self.args = command_text[1:]
 
-    def run(self):
+    def run(self, redraw=True):
         self.line_printed.emit(f"> {self.function} {' '.join(self.args)}\n")
         if self.function == "add":
             self.__add()
@@ -46,7 +46,7 @@ class Command:
         else:
             self.__print_syntax_error()
 
-        self.drawing.redraw()
+        if redraw: self.drawing.redraw()
 
     def __add(self):
         if len(self.args) != 1:
@@ -133,12 +133,14 @@ class Command:
 
         try:
             file = open(self.args[0], 'r')
-            lines = file.read().split()
+            lines = file.read().split("\n")
+
             for line in lines:
                 self.set(line)
-                self.run()
+                self.run(redraw=False)
         except IOError:
             self.line_printed.emit("Some error with data in file\n")
+        self.drawing.redraw()
 
     def __refresh(self):
         if len(self.args) != 0:
