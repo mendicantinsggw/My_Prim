@@ -11,7 +11,7 @@ class CmdInputHandler(QThread):
     def __init__(self, CmdUi):
         super().__init__(CmdUi)
         self.drawing = CmdUi.drawing
-        self.printed_line.emit("type 'help' to get all commands\n")
+        # self.printed_line.emit("type 'help' to get all commands\n")
         TypeCommandEventThread(lambda: self.run_cmd(CmdUi.input_line.text()))
 
     def run_cmd(self, command: str):

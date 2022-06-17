@@ -22,6 +22,7 @@ class CommandLineUi(QDialog):
         self.input_handler = CmdInputHandler(self)
         self.input_handler.command_to_execute.connect(self.run_cmd)
         self.input_handler.printed_line.connect(self.handle_line)
+        self.handle_line("type 'help' to get all commands\n")
 
     def run_cmd(self, command: str):  # line might have another type(?)
         command = Command(self.input_line, self.G, self.drawing, self.handle_line)
