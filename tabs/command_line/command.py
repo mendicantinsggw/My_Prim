@@ -48,6 +48,8 @@ class Command:
             self.__refresh()
         elif self.function == "help":
             self.__print_help()
+        elif self.function == "clear":
+            self.__clear_graph()
         else:
             self.__print_syntax_error()
 
@@ -187,7 +189,13 @@ class Command:
 
     def __print_help(self):
         self.handle_line(
-            "~ add id \n~ delete id \n~ connect id1 id2 weight \n~ delconnect id1 id2 \n~ prim id \n~ readfrom file.txt \n~ refresh \n")
+            "~ add id \n~ delete id \n~ connect id1 id2 weight \n~ delconnect id1 id2 \n~ prim id \n~ readfrom file.txt \n~ refresh \n~ clear \n")
 
     def __print_syntax_error(self):
         self.handle_line("There is no command like that\n")
+
+    def __clear_graph(self):
+        if len(self.args) != 0:
+            self.handle_line("Clear doesn't take any arguments")
+        else:
+            self.drawing.clear()
