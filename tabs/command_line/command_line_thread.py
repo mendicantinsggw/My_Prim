@@ -6,14 +6,13 @@ from tabs.command_line.command import Command
 
 class CmdInputHandler(QThread):
     printed_line = pyqtSignal(str)
+    command_to_execute = pyqtSignal(str)
 
     def __init__(self, CmdUi):
         super().__init__(CmdUi)
         self.drawing = CmdUi.drawing
         self.printed_line.emit("type 'help' to get all commands\n")
-        TypeCommandEventThread(lambda: self.run_cmd(CmdUi.input_line, CmdUi.G))
+        TypeCommandEventThread(lambda: self.run_cmd(CmdUi.input_line.text()))
 
-    def run_cmd(self, input_line: QLineEdit, G):  # line might have another type(?)
-        command = Command(input_line, G, self.drawing, self.printed_line)
-        command.run()
-        input_line.setText("")
+    def run_cmd(self, command: str):
+        self.command_to_execute.emit(command)

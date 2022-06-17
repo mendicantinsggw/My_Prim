@@ -1,3 +1,5 @@
+from typing import Callable
+
 import networkx as nx
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QLineEdit
@@ -7,13 +9,13 @@ from tabs.drawing.graph_drawing import GraphDrawing
 
 
 class Command:
-    def __init__(self, text_line: str | QLineEdit, G: Graph, drawing: GraphDrawing, line_printed: pyqtSignal):
+    def __init__(self, text_line: str | QLineEdit, G: Graph, drawing: GraphDrawing, handle_line: Callable):
         self.function: str = None
         self.args: list[str] = []
         self.set(text_line)
         self.G = G
         self.drawing = drawing
-        self.line_printed = line_printed
+        self.handle_line = handle_line
 
     def set(self, text_line: str | QLineEdit):
         try:
@@ -26,7 +28,7 @@ class Command:
             self.args = command_text[1:]
 
     def run(self, redraw=True):
-        self.line_printed.emit(f"> {self.function} {' '.join(self.args)}\n")
+        self.handle_line(f"> {self.function} {' '.join(self.args)}\n")
         if self.function == "add":
             self.__add()
         elif self.function == "delete":
@@ -50,27 +52,27 @@ class Command:
 
     def __add(self):
         if len(self.args) != 1:
-            self.line_printed.emit("only one id must be\n")
+            self.handle_line("only one id must be\n")
             return
 
         if not self.G.has_node(self.args[0]):
             self.G.add_node(self.args[0])
         else:
-            self.line_printed.emit("this node already exist\n")
+            self.handle_line("this node already exist\n")
 
     def __delete(self):
         if len(self.args) != 1:
-            self.line_printed.emit("only one id must be\n")
+            self.handle_line("only one id must be\n")
             return
 
         if self.G.has_node(self.args[0]):
             self.G.remove_node(self.args[0])
         else:
-            self.line_printed.emit("this node doesnt't exist\n")
+            self.handle_line("this node doesnt't exist\n")
 
     def __connect(self):
         if len(self.args) != 3:
-            self.line_printed.emit("two ids must be\n")
+            self.handle_line("two ids must be\n")
             return
 
         if self.G.has_node(self.args[0]) and self.G.has_node(self.args[1]) and not self.G.has_edge(self.args[0], self.args[1]):
@@ -78,20 +80,20 @@ class Command:
                 self.args[0], self.args[1], weight=int(self.args[2])
             )
         else:
-            self.line_printed.emit("nodes don't exist or edge already exist\n")
+            self.handle_line("nodes don't exist or edge already exist\n")
 
     def __delconnect(self):
         if len(self.args) != 2:
-            self.line_printed.emit("two ids must be\n")
+            self.handle_line("two ids must be\n")
             return
 
         if self.G.has_edge(self.args[0], self.args[1]):
             self.G.remove_edge(self.args[0], self.args[1])
         else:
-            self.line_printed.emit("nodes don't exist or edge doesn't exist\n")
+            self.handle_line("nodes don't exist or edge doesn't exist\n")
 
     def __prim_algorithm(self):
-        if len(self.args) != 1:
+        if len(self.args) == 1:
             if self.G.has_node(self.args[0]):
                 H = nx.Graph()
                 H.add_nodes_from(sorted(self.G.nodes(data=True)))
@@ -118,40 +120,42 @@ class Command:
                                         minimum = G[i][j]
                                         x = i
                                         y = j
-                    self.line_printed.emit(
+                    self.handle_line(
                         str(x) + "-" + str(y) + ":" + str(G[x][y]) + "\n")
                     print(str(x) + "-" + str(y) + ":" + str(G[x][y]))
                     selected[y] = True
                     no_edge += 1
         else:
-            self.line_printed.emit("one id must be\n")
+            self.handle_line("one id must be\n")
 
     def __readfrom(self):
         if len(self.args) != 1:
-            self.line_printed.emit("one id must be\n")
+            self.handle_line("one id must be\n")
             return
-
+        lines = ""
         try:
             file = open(self.args[0], 'r')
             lines = file.read().split("\n")
+            file.close()
 
-            for line in lines:
-                self.set(line)
-                self.run(redraw=False)
         except IOError:
-            self.line_printed.emit("Some error with data in file\n")
+            self.handle_line("Some error with data in file\n")
+
+        for line in lines:
+            self.set(line)
+            self.run(redraw=False)
         self.drawing.redraw()
 
     def __refresh(self):
         if len(self.args) != 0:
-            self.line_printed.emit("Refresh doesn't take any arguments")
+            self.handle_line("Refresh doesn't take any arguments")
             return
 
         self.drawing.redraw()
 
     def __print_help(self):
-        self.line_printed.emit(
+        self.handle_line(
             "~ add id \n~ delete id \n~ connect id1 id2 weight \n~ delconnect id1 id2 \n~ prim id \n~ readfrom file.txt \n~ refresh \n")
 
     def __print_syntax_error(self):
-        self.line_printed.emit("There is no command like that\n")
+        self.handle_line("There is no command like that\n")
