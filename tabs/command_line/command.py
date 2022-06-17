@@ -98,7 +98,7 @@ class Command:
             self.handle_line("nodes don't exist or edge doesn't exist\n")
 
     def __prim_algorithm(self):
-        if len(self.args) == 1:
+        if len(self.args) == 1 or len(self.args) == 2:
             chosen_edges = []
             node_names = list(self.G.nodes())
             if self.G.has_node(self.args[0]):
@@ -135,9 +135,12 @@ class Command:
                     selected[y] = True
                     no_edge += 1
 
-                self.__color_edges(chosen_edges)
+                if len(self.args) == 1:
+                    self.__color_edges(chosen_edges)
+                elif len(self.args) == 2:
+                    self.__draw_new_graph(chosen_edges)
         else:
-            self.handle_line("one id must be provided\n")
+            self.handle_line("one or two ids must be provided\n")
 
     def __color_edges(self, chosen_edges):
         old_G = self.drawing.G.copy()
@@ -161,6 +164,18 @@ class Command:
         for edge in old_edges:
             if not self.drawing.G.has_edge(edge[0], edge[1]):
                 self.drawing.G.add_edge(node_names[edge[0]], node_names[edge[1]], color='black', weight=edges[edge[0]][edge[1]])
+
+    def __draw_new_graph(self, chosen_edges):
+        old_G = self.drawing.G.copy()
+        self.drawing.clear()
+        edges = nx.adjacency_matrix(self.G).toarray()
+        node_names = list(self.G.nodes())
+
+        for node in node_names:
+            self.drawing.G.add_node(str(node))
+
+        for edge in chosen_edges:
+            self.drawing.G.add_edge(node_names[edge[0]], node_names[edge[1]], color='r', weight=edges[edge[0]][edge[1]])
 
     def __readfrom(self):
         if len(self.args) != 1:
@@ -189,7 +204,7 @@ class Command:
 
     def __print_help(self):
         self.handle_line(
-            "~ add id \n~ delete id \n~ connect id1 id2 weight \n~ delconnect id1 id2 \n~ prim id \n~ readfrom file.txt \n~ refresh \n~ clear \n")
+            "~ add id \n~ delete id \n~ connect id1 id2 weight \n~ delconnect id1 id2 \n~ prim id (clear)\n~ readfrom file.txt \n~ refresh \n~ clear \n")
 
     def __print_syntax_error(self):
         self.handle_line("There is no command like that\n")
