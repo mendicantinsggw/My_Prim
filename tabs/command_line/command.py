@@ -109,14 +109,14 @@ class Command:
 
                 A = nx.adjacency_matrix(self.G)
                 # A = nx.to_numpy_matrix(self.G, nonedge=None).tolist()
-                INF = 10000
+                INF = float('inf')
                 V = len(A.toarray())
                 G = nx.to_numpy_matrix(self.G, nonedge=None).tolist()
                 selected = [0] * len(A.toarray())
-                no_edge = 0
                 print(list(self.G.nodes()))
                 selected[list(self.G.nodes()).index(self.args[0])] = True
-                while no_edge < V - 1:
+
+                for edges_neede in range(V-1):
                     minimum = INF
                     x = 0
                     y = 0
@@ -128,12 +128,10 @@ class Command:
                                         minimum = G[i][j]
                                         x = i
                                         y = j
-                    self.handle_line(
-                        str(node_names[x]) + " - " + str(node_names[y]) + ": " + str(G[x][y]) + "\n")
-                    print(str(node_names[x]) + "-" + str(node_names[y]) + ":" + str(G[x][y]))
-                    chosen_edges.append((x, y))
-                    selected[y] = True
-                    no_edge += 1
+
+                    self.__print_new_edge(G, node_names, x, y)  # print new edge
+                    chosen_edges.append((x, y))  # save x - y edge
+                    selected[y] = True  # mark that node y now belongs to new tree
 
                 if len(self.args) == 1:
                     self.__color_edges(chosen_edges)
@@ -141,6 +139,11 @@ class Command:
                     self.__draw_new_graph(chosen_edges)
         else:
             self.handle_line("one or two ids must be provided\n")
+
+    def __print_new_edge(self, G, node_names, x, y):
+        self.handle_line(
+            str(node_names[x]) + " - " + str(node_names[y]) + ": " + str(G[x][y]) + "\n")
+        print(str(node_names[x]) + "-" + str(node_names[y]) + ":" + str(G[x][y]))
 
     def __color_edges(self, chosen_edges):
         old_G = self.drawing.G.copy()
