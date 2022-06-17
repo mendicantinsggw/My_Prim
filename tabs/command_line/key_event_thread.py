@@ -1,8 +1,7 @@
-from threading import Thread
 from pynput.keyboard import Listener, Key
 
 
-class TypeCommandEventThread(Thread):
+class TypeCommandEventThread():
     def __init__(self, run_cmd):
         super().__init__()
         self.run_cmd = run_cmd

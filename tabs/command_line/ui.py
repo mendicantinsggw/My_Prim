@@ -1,9 +1,9 @@
 import networkx as nx
 from PyQt5.QtWidgets import QDialog, QTextEdit, QLineEdit, QVBoxLayout
 
-from tabs.command_line.key_event_thread import TypeCommandEventThread
 from tabs.command_line.command_line_thread import CmdInputHandler
 from tabs.drawing.graph_drawing import GraphDrawing
+from tabs.command_line.command import  Command
 
 
 class CommandLineUi(QDialog):
@@ -20,7 +20,14 @@ class CommandLineUi(QDialog):
         self.layout.addWidget(self.input_line)
 
         self.input_handler = CmdInputHandler(self)
+        self.input_handler.command_to_execute.connect(self.run_cmd)
         self.input_handler.printed_line.connect(self.handle_line)
+        self.handle_line("type 'help' to get all commands\n")
+
+    def run_cmd(self, command: str):  # line might have another type(?)
+        command = Command(self.input_line, self.G, self.drawing, self.handle_line)
+        self.input_line.setText("")
+        command.run()
 
     def handle_line(self, line):
         cursor = self.textEdit.textCursor()
