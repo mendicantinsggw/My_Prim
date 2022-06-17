@@ -1,6 +1,7 @@
 from typing import Callable
 
 import networkx as nx
+import matplotlib.pyplot as plt
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QLineEdit
 from networkx import Graph
@@ -28,6 +29,8 @@ class Command:
             self.args = command_text[1:]
 
     def run(self, redraw=True):
+        if self.function is None: return
+
         self.handle_line(f"> {self.function} {' '.join(self.args)}\n")
         if self.function == "add":
             self.__add()
@@ -52,17 +55,17 @@ class Command:
 
     def __add(self):
         if len(self.args) != 1:
-            self.handle_line("only one id must be\n")
+            self.handle_line("only one id must be provided\n")
             return
 
         if not self.G.has_node(self.args[0]):
-            self.G.add_node(self.args[0])
+            self.G.add_node(self.args[0], color='b')
         else:
             self.handle_line("this node already exist\n")
 
     def __delete(self):
         if len(self.args) != 1:
-            self.handle_line("only one id must be\n")
+            self.handle_line("only one id must be provided\n")
             return
 
         if self.G.has_node(self.args[0]):
@@ -72,19 +75,19 @@ class Command:
 
     def __connect(self):
         if len(self.args) != 3:
-            self.handle_line("two ids must be\n")
+            self.handle_line("two ids must be provided\n")
             return
 
         if self.G.has_node(self.args[0]) and self.G.has_node(self.args[1]) and not self.G.has_edge(self.args[0], self.args[1]):
             self.G.add_edge(
-                self.args[0], self.args[1], weight=int(self.args[2])
+                self.args[0], self.args[1], weight=int(self.args[2]), color="black"
             )
         else:
             self.handle_line("nodes don't exist or edge already exist\n")
 
     def __delconnect(self):
         if len(self.args) != 2:
-            self.handle_line("two ids must be\n")
+            self.handle_line("two ids must be provided\n")
             return
 
         if self.G.has_edge(self.args[0], self.args[1]):
@@ -94,6 +97,8 @@ class Command:
 
     def __prim_algorithm(self):
         if len(self.args) == 1:
+            chosen_edges = []
+            node_names = list(self.G.nodes())
             if self.G.has_node(self.args[0]):
                 H = nx.Graph()
                 H.add_nodes_from(sorted(self.G.nodes(data=True)))
@@ -101,9 +106,10 @@ class Command:
                 self.G = H
 
                 A = nx.adjacency_matrix(self.G)
+                # A = nx.to_numpy_matrix(self.G, nonedge=None).tolist()
                 INF = 10000
                 V = len(A.toarray())
-                G = A.toarray()
+                G = nx.to_numpy_matrix(self.G, nonedge=None).tolist()
                 selected = [0] * len(A.toarray())
                 no_edge = 0
                 print(list(self.G.nodes()))
@@ -115,22 +121,48 @@ class Command:
                     for i in range(V):
                         if selected[i]:
                             for j in range(V):
-                                if (not selected[j]) and G[i][j]:
+                                if (not selected[j]) and G[i][j] is not None:
                                     if minimum > G[i][j]:
                                         minimum = G[i][j]
                                         x = i
                                         y = j
                     self.handle_line(
-                        str(x) + "-" + str(y) + ":" + str(G[x][y]) + "\n")
-                    print(str(x) + "-" + str(y) + ":" + str(G[x][y]))
+                        str(node_names[x]) + " - " + str(node_names[y]) + ": " + str(G[x][y]) + "\n")
+                    print(str(node_names[x]) + "-" + str(node_names[y]) + ":" + str(G[x][y]))
+                    chosen_edges.append((x, y))
                     selected[y] = True
                     no_edge += 1
+
+                self.__color_edges(chosen_edges)
         else:
-            self.handle_line("one id must be\n")
+            self.handle_line("one id must be provided\n")
+
+    def __color_edges(self, chosen_edges):
+        old_G = self.drawing.G.copy()
+        self.drawing.clear()
+        edges = nx.adjacency_matrix(self.G).toarray()
+        node_names = list(self.G.nodes())
+
+        for node in node_names:
+            self.drawing.G.add_node(str(node))
+
+        for edge in chosen_edges:
+            self.drawing.G.add_edge(node_names[edge[0]], node_names[edge[1]], color='r', weight=edges[edge[0]][edge[1]])
+
+        old_edges = list()
+        old_matrix = nx.to_numpy_matrix(self.G, nonedge=None).tolist()
+        for x in range(len(old_matrix)):
+            for y in range(len(old_matrix)):
+                if old_matrix[x][y] is not None and not self.drawing.G.has_edge(node_names[x], node_names[y]):
+                    old_edges.append((x, y))
+
+        for edge in old_edges:
+            if not self.drawing.G.has_edge(edge[0], edge[1]):
+                self.drawing.G.add_edge(node_names[edge[0]], node_names[edge[1]], color='black', weight=edges[edge[0]][edge[1]])
 
     def __readfrom(self):
         if len(self.args) != 1:
-            self.handle_line("one id must be\n")
+            self.handle_line("one id must be provided\n")
             return
         lines = ""
         try:
